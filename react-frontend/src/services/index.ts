@@ -1,0 +1,9 @@
+// Central export for all services
+export { apiService } from './api.service';
+export { authService } from './auth.service';
+export { applicationService } from './application.service';
+export { milestoneService } from './milestone.service';
+export { evaluationService } from './evaluation.service';
+export { messageService } from './message.service';
+export { assignmentService } from './assignment.service';
+export { notificationService } from './notification.service';

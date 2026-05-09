@@ -22,12 +22,15 @@ import SupervisorStudentsPage from './pages/supervisor/StudentsPage';
 import SupervisorMilestonesPage from './pages/supervisor/MilestonesPage';
 import SupervisorEvaluationsPage from './pages/supervisor/EvaluationsPage';
 import SupervisorMessagesPage from './pages/supervisor/MessagesPage';
+import SupervisorAttendancePage from './pages/supervisor/AttendancePage';
+import SupervisorMonthlyReportsPage from './pages/supervisor/MonthlyReportsPage';
 
 // Student Pages
 import StudentDashboardPage from './pages/student/DashboardPage';
 import StudentMilestonesPage from './pages/student/MilestonesPage';
 import StudentMessagesPage from './pages/student/MessagesPage';
 import StudentEvaluationPage from './pages/student/EvaluationPage';
+import StudentMonthlyReportsPage from './pages/student/MonthlyReportsPage';
 
 function App() {
   return (
@@ -55,12 +58,15 @@ function App() {
         <Route path="/supervisor/milestones" element={<SupervisorMilestonesPage />} />
         <Route path="/supervisor/evaluations" element={<SupervisorEvaluationsPage />} />
         <Route path="/supervisor/messages" element={<SupervisorMessagesPage />} />
+        <Route path="/supervisor/attendance" element={<SupervisorAttendancePage />} />
+        <Route path="/supervisor/monthly-reports" element={<SupervisorMonthlyReportsPage />} />
         
         {/* Student Routes */}
         <Route path="/student/dashboard" element={<StudentDashboardPage />} />
         <Route path="/student/milestones" element={<StudentMilestonesPage />} />
         <Route path="/student/messages" element={<StudentMessagesPage />} />
         <Route path="/student/evaluation" element={<StudentEvaluationPage />} />
+        <Route path="/student/monthly-reports" element={<StudentMonthlyReportsPage />} />
       </Routes>
     </Router>
   );

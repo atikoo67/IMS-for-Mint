@@ -7,3 +7,5 @@ export { evaluationService } from './evaluation.service';
 export { messageService } from './message.service';
 export { assignmentService } from './assignment.service';
 export { notificationService } from './notification.service';
+export { attendanceService } from './attendance.service';
+export { monthlyReportService } from './monthly-report.service';

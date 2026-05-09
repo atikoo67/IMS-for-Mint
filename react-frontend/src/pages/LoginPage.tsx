@@ -83,7 +83,7 @@ const LoginPage: React.FC = () => {
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-3">
             <img 
-              src="/assets/images/mint logo6.png" 
+              src="/assets/images/mint_logo.png" 
               alt="MInT Logo" 
               className="w-16 h-16 object-contain"
             />
@@ -144,7 +144,7 @@ const LoginPage: React.FC = () => {
           {/* Mobile Logo */}
           <div className="lg:hidden flex justify-center mb-6">
             <img 
-              src="/assets/images/mint logo6.png" 
+              src="/assets/images/mint_logo.png" 
               alt="MInT Logo" 
               className="w-16 h-16 object-contain"
             />

@@ -12,6 +12,8 @@ import {
   InternshipAssignment,
   AssignmentStatus
 } from '../types';
+import { Attendance, AttendanceInput } from '../types/attendance.types';
+import { MonthlyReport, MonthlyReportInput, MonthlyReportReview, MonthlyReportStatus } from '../types/monthly-report.types';
 import { mockStudents, mockSupervisors, universities, departments } from './mock-data.service';
 
 // Storage keys
@@ -20,6 +22,8 @@ const STORAGE_KEYS = {
   MILESTONES: 'mint_ims_milestones',
   EVALUATIONS: 'mint_ims_evaluations',
   ASSIGNMENTS: 'mint_ims_assignments',
+  ATTENDANCE: 'mint_ims_attendance',
+  MONTHLY_REPORTS: 'mint_ims_monthly_reports',
 };
 
 // Helper to get from localStorage with fallback
@@ -172,6 +176,72 @@ function generateMockEvaluations(): Evaluation[] {
   });
 }
 
+// Generate mock attendance records
+function generateMockAttendance(): Attendance[] {
+  const assignments = getFromStorage<InternshipAssignment[]>(
+    STORAGE_KEYS.ASSIGNMENTS,
+    generateMockAssignments()
+  );
+  
+  return assignments.slice(0, 8).map((assignment, i) => {
+    const student = mockStudents.find(s => s.user_id === assignment.student_id);
+    const supervisor = mockSupervisors.find(s => s.user_id === assignment.supervisor_id);
+    
+    return {
+      attendance_id: i + 1,
+      internship_id: i + 1,
+      student_id: assignment.student_id,
+      percentage: 75 + Math.floor(Math.random() * 25), // 75-100%
+      marked_by: assignment.supervisor_id,
+      updated_at: new Date(2026, 7, 15 + i).toISOString(),
+      student_name: student?.full_name || assignment.student_name,
+      supervisor_name: supervisor?.full_name || assignment.supervisor_name,
+    };
+  });
+}
+
+// Generate mock monthly reports
+function generateMockMonthlyReports(): MonthlyReport[] {
+  const assignments = getFromStorage<InternshipAssignment[]>(
+    STORAGE_KEYS.ASSIGNMENTS,
+    generateMockAssignments()
+  );
+  
+  const reports: MonthlyReport[] = [];
+  const months = [5, 6, 7]; // May, June, July
+  
+  assignments.slice(0, 5).forEach((assignment, assignIdx) => {
+    const student = mockStudents.find(s => s.user_id === assignment.student_id);
+    const supervisor = mockSupervisors.find(s => s.user_id === assignment.supervisor_id);
+    
+    months.forEach((month, monthIdx) => {
+      const statuses: MonthlyReportStatus[] = [
+        MonthlyReportStatus.APPROVED,
+        MonthlyReportStatus.REVIEWED,
+        MonthlyReportStatus.SUBMITTED
+      ];
+      const status = statuses[monthIdx];
+      
+      reports.push({
+        report_id: assignIdx * 3 + monthIdx + 1,
+        internship_id: assignIdx + 1,
+        student_id: assignment.student_id,
+        month,
+        year: 2026,
+        summary: `Monthly progress report for ${new Date(2026, month - 1).toLocaleString('default', { month: 'long' })}. Completed assigned tasks and milestones on schedule.`,
+        submitted_at: new Date(2026, month - 1, 28).toISOString(),
+        reviewed_by: status !== MonthlyReportStatus.SUBMITTED ? assignment.supervisor_id : undefined,
+        reviewer_name: status !== MonthlyReportStatus.SUBMITTED ? supervisor?.full_name : undefined,
+        status,
+        feedback: status === MonthlyReportStatus.APPROVED ? 'Good progress. Keep up the good work.' : undefined,
+        student_name: student?.full_name || assignment.student_name,
+      });
+    });
+  });
+  
+  return reports;
+}
+
 // Initialize storage with mock data if empty
 function initializeStorage(): void {
   if (!localStorage.getItem(STORAGE_KEYS.APPLICATIONS)) {
@@ -185,6 +255,12 @@ function initializeStorage(): void {
   }
   if (!localStorage.getItem(STORAGE_KEYS.EVALUATIONS)) {
     saveToStorage(STORAGE_KEYS.EVALUATIONS, generateMockEvaluations());
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.ATTENDANCE)) {
+    saveToStorage(STORAGE_KEYS.ATTENDANCE, generateMockAttendance());
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.MONTHLY_REPORTS)) {
+    saveToStorage(STORAGE_KEYS.MONTHLY_REPORTS, generateMockMonthlyReports());
   }
 }
 
@@ -293,12 +369,143 @@ class MockStorageService {
     return evaluations[index];
   }
   
+  // Attendance
+  getAttendance(internshipId: number): Attendance | null {
+    const allAttendance = getFromStorage<Attendance[]>(STORAGE_KEYS.ATTENDANCE, []);
+    return allAttendance.find(a => a.internship_id === internshipId) || null;
+  }
+  
+  getAllAttendance(supervisorId?: string): Attendance[] {
+    const allAttendance = getFromStorage<Attendance[]>(STORAGE_KEYS.ATTENDANCE, []);
+    if (supervisorId) {
+      return allAttendance.filter(a => a.marked_by === supervisorId);
+    }
+    return allAttendance;
+  }
+  
+  recordAttendance(data: AttendanceInput): Attendance {
+    const allAttendance = getFromStorage<Attendance[]>(STORAGE_KEYS.ATTENDANCE, []);
+    const existing = allAttendance.find(a => a.internship_id === data.internship_id);
+    
+    if (existing) {
+      // Update existing
+      return this.updateAttendance(existing.attendance_id, data.percentage);
+    }
+    
+    // Create new
+    const student = mockStudents.find(s => s.user_id === data.student_id);
+    const assignments = this.getAssignments();
+    const assignment = assignments.find(a => a.student_id === data.student_id);
+    const supervisor = mockSupervisors.find(s => s.user_id === assignment?.supervisor_id);
+    
+    const newAttendance: Attendance = {
+      attendance_id: allAttendance.length + 1,
+      internship_id: data.internship_id,
+      student_id: data.student_id,
+      percentage: Math.max(0, Math.min(100, data.percentage)), // Clamp 0-100
+      marked_by: assignment?.supervisor_id || '',
+      updated_at: new Date().toISOString(),
+      student_name: student?.full_name,
+      supervisor_name: supervisor?.full_name,
+    };
+    
+    allAttendance.push(newAttendance);
+    saveToStorage(STORAGE_KEYS.ATTENDANCE, allAttendance);
+    return newAttendance;
+  }
+  
+  updateAttendance(attendanceId: number, percentage: number): Attendance {
+    const allAttendance = getFromStorage<Attendance[]>(STORAGE_KEYS.ATTENDANCE, []);
+    const index = allAttendance.findIndex(a => a.attendance_id === attendanceId);
+    if (index === -1) throw new Error('Attendance record not found');
+    
+    allAttendance[index] = {
+      ...allAttendance[index],
+      percentage: Math.max(0, Math.min(100, percentage)), // Clamp 0-100
+      updated_at: new Date().toISOString(),
+    };
+    
+    saveToStorage(STORAGE_KEYS.ATTENDANCE, allAttendance);
+    return allAttendance[index];
+  }
+  
+  // Monthly Reports
+  getStudentMonthlyReports(studentId: string): MonthlyReport[] {
+    const allReports = getFromStorage<MonthlyReport[]>(STORAGE_KEYS.MONTHLY_REPORTS, []);
+    return allReports.filter(r => r.student_id === studentId);
+  }
+  
+  getInternshipMonthlyReports(internshipId: number): MonthlyReport[] {
+    const allReports = getFromStorage<MonthlyReport[]>(STORAGE_KEYS.MONTHLY_REPORTS, []);
+    return allReports.filter(r => r.internship_id === internshipId);
+  }
+  
+  getSupervisorMonthlyReports(supervisorId: string): MonthlyReport[] {
+    const allReports = getFromStorage<MonthlyReport[]>(STORAGE_KEYS.MONTHLY_REPORTS, []);
+    const assignments = this.getAssignments().filter(a => a.supervisor_id === supervisorId);
+    const studentIds = assignments.map(a => a.student_id);
+    return allReports.filter(r => studentIds.includes(r.student_id));
+  }
+  
+  submitMonthlyReport(data: MonthlyReportInput): MonthlyReport {
+    const allReports = getFromStorage<MonthlyReport[]>(STORAGE_KEYS.MONTHLY_REPORTS, []);
+    
+    // Check for duplicate (unique: internship_id, month, year)
+    const existing = allReports.find(
+      r => r.internship_id === data.internship_id && r.month === data.month && r.year === data.year
+    );
+    if (existing) {
+      throw new Error('Monthly report already exists for this period');
+    }
+    
+    const student = mockStudents.find(s => s.user_id === data.student_id);
+    
+    const newReport: MonthlyReport = {
+      report_id: allReports.length + 1,
+      internship_id: data.internship_id,
+      student_id: data.student_id,
+      month: data.month,
+      year: data.year,
+      summary: data.summary,
+      submitted_at: new Date().toISOString(),
+      status: MonthlyReportStatus.SUBMITTED,
+      student_name: student?.full_name,
+    };
+    
+    allReports.push(newReport);
+    saveToStorage(STORAGE_KEYS.MONTHLY_REPORTS, allReports);
+    return newReport;
+  }
+  
+  reviewMonthlyReport(data: MonthlyReportReview): MonthlyReport {
+    const allReports = getFromStorage<MonthlyReport[]>(STORAGE_KEYS.MONTHLY_REPORTS, []);
+    const index = allReports.findIndex(r => r.report_id === data.report_id);
+    if (index === -1) throw new Error('Monthly report not found');
+    
+    const assignments = this.getAssignments();
+    const assignment = assignments.find(a => a.student_id === allReports[index].student_id);
+    const supervisor = mockSupervisors.find(s => s.user_id === assignment?.supervisor_id);
+    
+    allReports[index] = {
+      ...allReports[index],
+      status: data.status,
+      feedback: data.feedback,
+      reviewed_by: assignment?.supervisor_id,
+      reviewer_name: supervisor?.full_name,
+    };
+    
+    saveToStorage(STORAGE_KEYS.MONTHLY_REPORTS, allReports);
+    return allReports[index];
+  }
+  
   // Reset all data
   resetAllData(): void {
     localStorage.removeItem(STORAGE_KEYS.APPLICATIONS);
     localStorage.removeItem(STORAGE_KEYS.ASSIGNMENTS);
     localStorage.removeItem(STORAGE_KEYS.MILESTONES);
     localStorage.removeItem(STORAGE_KEYS.EVALUATIONS);
+    localStorage.removeItem(STORAGE_KEYS.ATTENDANCE);
+    localStorage.removeItem(STORAGE_KEYS.MONTHLY_REPORTS);
     initializeStorage();
   }
 }

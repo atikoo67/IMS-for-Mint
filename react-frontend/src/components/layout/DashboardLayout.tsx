@@ -106,6 +106,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         return [
           { label: 'My Students', href: ROUTES.SUPERVISOR_STUDENTS, icon: icons.students },
           { label: 'Milestones', href: ROUTES.SUPERVISOR_MILESTONES, icon: icons.milestones },
+          { label: 'Attendance', href: ROUTES.SUPERVISOR_ATTENDANCE, icon: icons.evaluations },
+          { label: 'Monthly Reports', href: ROUTES.SUPERVISOR_MONTHLY_REPORTS, icon: icons.reports },
           { label: 'Evaluations', href: ROUTES.SUPERVISOR_EVALUATIONS, icon: icons.evaluations },
           { label: 'Messages', href: ROUTES.SUPERVISOR_MESSAGES, icon: icons.messages },
         ];
@@ -113,6 +115,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         return [
           { label: 'Dashboard', href: ROUTES.STUDENT_DASHBOARD, icon: icons.dashboard },
           { label: 'Milestones', href: ROUTES.STUDENT_MILESTONES, icon: icons.milestones },
+          { label: 'Monthly Reports', href: ROUTES.STUDENT_MONTHLY_REPORTS, icon: icons.reports },
           { label: 'Messages', href: ROUTES.STUDENT_MESSAGES, icon: icons.messages },
           { label: 'Evaluation', href: ROUTES.STUDENT_EVALUATION, icon: icons.evaluations },
         ];

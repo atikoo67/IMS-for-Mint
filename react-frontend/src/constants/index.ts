@@ -50,12 +50,15 @@ export const ROUTES = {
   SUPERVISOR_MILESTONES: '/supervisor/milestones',
   SUPERVISOR_EVALUATIONS: '/supervisor/evaluations',
   SUPERVISOR_MESSAGES: '/supervisor/messages',
+  SUPERVISOR_ATTENDANCE: '/supervisor/attendance',
+  SUPERVISOR_MONTHLY_REPORTS: '/supervisor/monthly-reports',
   
   // Student routes
   STUDENT_DASHBOARD: '/student/dashboard',
   STUDENT_MILESTONES: '/student/milestones',
   STUDENT_MESSAGES: '/student/messages',
   STUDENT_EVALUATION: '/student/evaluation',
+  STUDENT_MONTHLY_REPORTS: '/student/monthly-reports',
 };
 
 export const LETTER_GRADES = ['A', 'B', 'C', 'D', 'F'] as const;

@@ -6,3 +6,5 @@ export * from './evaluation.types';
 export * from './assignment.types';
 export * from './message.types';
 export * from './notification.types';
+export * from './attendance.types';
+export * from './monthly-report.types';

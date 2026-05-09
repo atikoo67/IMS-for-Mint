@@ -10,3 +10,5 @@ export { FileUpload } from './FileUpload';
 export { LoadingSpinner } from './LoadingSpinner';
 export { EmptyState } from './EmptyState';
 export { ConfirmDialog } from './ConfirmDialog';
+export { EthiopianFlag } from './EthiopianFlag';
+export { StatCard } from './StatCard';

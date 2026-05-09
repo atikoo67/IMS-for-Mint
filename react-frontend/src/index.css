@@ -1,17 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Ethiopic:wght@400;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  body {
+    @apply font-sans text-body text-text-primary bg-surface-page antialiased;
+    margin: 0;
+  }
+
+  code {
+    @apply font-mono;
+  }
+
+  h1 {
+    @apply text-h1 text-text-primary;
+  }
+
+  h2 {
+    @apply text-h2 text-text-primary;
+  }
+
+  h3 {
+    @apply text-h3 text-text-primary;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@layer components {
+  /* Focus ring for accessibility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-4 focus:ring-mint-blue focus:ring-opacity-20;
+  }
+
+  /* Ethiopian flag stripe */
+  .eth-flag-stripe {
+    @apply flex h-[5px] w-full;
+  }
+
+  .eth-flag-stripe > div:nth-child(1) {
+    @apply flex-1 bg-eth-green;
+  }
+
+  .eth-flag-stripe > div:nth-child(2) {
+    @apply flex-1 bg-eth-yellow;
+  }
+
+  .eth-flag-stripe > div:nth-child(3) {
+    @apply flex-1 bg-eth-red;
+  }
 }

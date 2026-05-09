@@ -2,46 +2,17 @@
 // This simulates a backend API without requiring a real server
 
 import { User, UserRole, UserStatus, AuthResponse } from '../types';
+import { allMockUsers } from './mock-data.service';
 
-// Mock user database
-const MOCK_USERS: Array<User & { password: string }> = [
-  {
-    user_id: 'admin-001',
-    email: 'admin@mint.gov.et',
-    password: 'admin123', // In production, this would be hashed
-    full_name: 'System Administrator',
-    role: UserRole.ADMIN,
-    status: UserStatus.ACTIVE,
-    created_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    user_id: 'uni-001',
-    email: 'university@example.edu.et',
-    password: 'uni123',
-    full_name: 'University Coordinator - Addis Ababa University',
-    role: UserRole.UNIVERSITY,
-    status: UserStatus.ACTIVE,
-    created_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    user_id: 'super-001',
-    email: 'supervisor@mint.gov.et',
-    password: 'super123',
-    full_name: 'John Supervisor - Software Development',
-    role: UserRole.SUPERVISOR,
-    status: UserStatus.ACTIVE,
-    created_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    user_id: 'student-001',
-    email: 'student@example.edu.et',
-    password: 'student123',
-    full_name: 'Jane Student (STU-2024-001)',
-    role: UserRole.STUDENT,
-    status: UserStatus.ACTIVE,
-    created_at: '2024-01-01T00:00:00Z',
-  },
-];
+// Mock user database with passwords
+const MOCK_USERS: Array<User & { password: string }> = allMockUsers.map(user => ({
+  ...user,
+  status: UserStatus.ACTIVE,
+  password: user.role === UserRole.ADMIN ? 'admin123' :
+           user.role === UserRole.STUDENT ? 'student123' :
+           user.role === UserRole.SUPERVISOR ? 'super123' :
+           'uni123'
+}));
 
 class MockAuthService {
   private delay(ms: number = 500): Promise<void> {
@@ -99,35 +70,48 @@ class MockAuthService {
     return !!localStorage.getItem('auth_token');
   }
 
-  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  async changePassword(_currentPassword: string, _newPassword: string): Promise<void> {
     await this.delay(500);
     // Mock implementation - in real app, this would validate and update password
     console.log('Password change simulated');
+  }
+  
+  // Get all users (for admin purposes)
+  getAllUsers(): User[] {
+    return MOCK_USERS.map(({ password, ...user }) => user);
+  }
+  
+  // Get users by role
+  getUsersByRole(role: UserRole): User[] {
+    return MOCK_USERS
+      .filter(u => u.role === role)
+      .map(({ password, ...user }) => user);
   }
 }
 
 export const mockAuthService = new MockAuthService();
 
-// Export mock credentials for reference
+// Export mock credentials for reference (primary test accounts)
 export const MOCK_CREDENTIALS = {
-  admin: {
+  ROLE_ADMIN: {
     email: 'admin@mint.gov.et',
     password: 'admin123',
     role: 'Admin',
   },
-  university: {
-    email: 'university@example.edu.et',
+  ROLE_UNIVERSITY: {
+    email: 'coordinator.aau@aau.edu.et',
     password: 'uni123',
     role: 'University Coordinator',
   },
-  supervisor: {
-    email: 'supervisor@mint.gov.et',
+  ROLE_SUPERVISOR: {
+    email: 'kidus.kebede@mint.gov.et',
     password: 'super123',
     role: 'Supervisor',
   },
-  student: {
-    email: 'student@example.edu.et',
+  ROLE_STUDENT: {
+    email: 'abebe.alemu@aau.edu.et',
     password: 'student123',
     role: 'Student',
   },
 };
+

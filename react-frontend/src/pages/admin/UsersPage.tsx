@@ -1,5 +1,4 @@
 // Admin - User Management Page (FR-ACCT)
-import React from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { Card, Button } from '../../components/common';
 

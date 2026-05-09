@@ -1,5 +1,5 @@
 // Student - Milestones Page (FR-MIL-001 to FR-MIL-005)
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { MilestoneSubmissionForm } from '../../components/student';
 import { LoadingSpinner, Card, StatusBadge, Button, Modal, EmptyState } from '../../components/common';

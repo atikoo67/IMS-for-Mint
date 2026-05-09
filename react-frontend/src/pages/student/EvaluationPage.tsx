@@ -1,5 +1,5 @@
 // Student - Evaluation Page (FR-EVAL-005, FR-EVAL-006)
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { LoadingSpinner, Card, EmptyState } from '../../components/common';
 import { Evaluation } from '../../types';

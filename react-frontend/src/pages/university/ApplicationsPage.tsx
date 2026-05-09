@@ -1,5 +1,5 @@
 // University User - Applications Page (FR-APP-001 to FR-APP-008)
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { ApplicationForm } from '../../components/university';
 import { LoadingSpinner, Card, Button, StatusBadge, Modal } from '../../components/common';

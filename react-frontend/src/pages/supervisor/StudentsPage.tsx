@@ -1,5 +1,5 @@
 // Supervisor - My Students Page (FR-SUP-005)
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { LoadingSpinner, Card, EmptyState, Button } from '../../components/common';
 import { InternshipAssignment } from '../../types';

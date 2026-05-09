@@ -1,5 +1,5 @@
 // Supervisor - Milestones Review Page (FR-MIL-006 to FR-MIL-009)
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { MilestoneReviewCard } from '../../components/supervisor';
 import { LoadingSpinner, EmptyState } from '../../components/common';

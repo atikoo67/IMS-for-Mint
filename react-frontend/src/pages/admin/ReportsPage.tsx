@@ -1,5 +1,5 @@
 // Admin - Reports Page (FR-RPT-001 to FR-RPT-004)
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { Card, Button } from '../../components/common';
 import { applicationService } from '../../services';

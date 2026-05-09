@@ -1,5 +1,5 @@
 // University User - Students Page
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { LoadingSpinner, Card, EmptyState } from '../../components/common';
 import { InternshipApplication } from '../../types';

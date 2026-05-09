@@ -1,5 +1,5 @@
 // Admin - Application Review Page (FR-REV-001 to FR-REV-006) - MInT IMS Design System
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { ApplicationReviewCard } from '../../components/admin';
 import { LoadingSpinner, EmptyState, Button } from '../../components/common';

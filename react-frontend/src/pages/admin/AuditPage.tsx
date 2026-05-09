@@ -1,5 +1,4 @@
 // Admin - Audit Logs Page (FR-RPT-003, FR-RPT-004)
-import React from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { Card } from '../../components/common';
 

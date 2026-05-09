@@ -1,8 +1,8 @@
 // Supervisor - Messages Page (FR-MSG-001 to FR-MSG-005)
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { LoadingSpinner, Card, Button, Textarea, EmptyState } from '../../components/common';
-import { MessageThread, Message } from '../../types';
+import { MessageThread } from '../../types';
 import { messageService } from '../../services';
 import { formatDateTime } from '../../utils/format';
 

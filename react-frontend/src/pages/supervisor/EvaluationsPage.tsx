@@ -1,5 +1,5 @@
 // Supervisor - Evaluations Page (FR-EVAL-001 to FR-EVAL-003)
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { LoadingSpinner, Card, Button, EmptyState } from '../../components/common';
 import { Evaluation, InternshipAssignment } from '../../types';

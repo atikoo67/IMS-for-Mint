@@ -1,5 +1,5 @@
 // Admin - Evaluation Publishing Page (FR-EVAL-004 to FR-EVAL-005)
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { LoadingSpinner, Card, Button, EmptyState } from '../../components/common';
 import { Evaluation } from '../../types';
@@ -105,7 +105,7 @@ export default function AdminEvaluationsPage() {
 
                   <div className="flex gap-3 pt-4">
                     <Button
-                      variant="success"
+                      variant="primary"
                       onClick={() => handlePublish(evaluation.evaluation_id)}
                     >
                       Publish Evaluation

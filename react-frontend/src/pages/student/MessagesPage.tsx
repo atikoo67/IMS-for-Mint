@@ -1,5 +1,5 @@
 // Student - Messages Page (FR-MSG-001 to FR-MSG-003)
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { LoadingSpinner, Card, Button, Textarea, EmptyState } from '../../components/common';
 import { MessageThread } from '../../types';

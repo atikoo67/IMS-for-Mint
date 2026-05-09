@@ -1,5 +1,5 @@
 // University User - Reports Page (FR-EVAL-006)
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { LoadingSpinner, Card, Button, EmptyState } from '../../components/common';
 import { InternshipApplication } from '../../types';

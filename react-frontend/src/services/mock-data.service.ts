@@ -38,7 +38,6 @@ export const mockStudents: User[] = Array.from({ length: 30 }, (_, i) => {
   const firstName = ethiopianFirstNames[i % ethiopianFirstNames.length];
   const lastName = ethiopianLastNames[Math.floor(i / ethiopianFirstNames.length) % ethiopianLastNames.length];
   const university = universities[i % universities.length];
-  const department = departments[i % departments.length];
   
   return {
     user_id: `student_${i + 1}`,
@@ -54,7 +53,6 @@ export const mockStudents: User[] = Array.from({ length: 30 }, (_, i) => {
 export const mockSupervisors: User[] = Array.from({ length: 15 }, (_, i) => {
   const firstName = ethiopianFirstNames[(i + 10) % ethiopianFirstNames.length];
   const lastName = ethiopianLastNames[(i + 5) % ethiopianLastNames.length];
-  const department = departments[i % departments.length];
   
   return {
     user_id: `supervisor_${i + 1}`,

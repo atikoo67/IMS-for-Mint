@@ -45,15 +45,31 @@ function saveToStorage<T>(key: string, data: T): void {
   }
 }
 
-// Generate mock applications
+// Generate mock applications - ALL 30 students
 function generateMockApplications(): InternshipApplication[] {
-  const statuses: ApplicationStatus[] = [ApplicationStatus.PENDING, ApplicationStatus.APPROVED, ApplicationStatus.REJECTED];
+  const statuses: ApplicationStatus[] = [
+    ApplicationStatus.APPROVED,
+    ApplicationStatus.APPROVED,
+    ApplicationStatus.APPROVED,
+    ApplicationStatus.APPROVED,
+    ApplicationStatus.APPROVED,
+    ApplicationStatus.PENDING,
+    ApplicationStatus.PENDING,
+    ApplicationStatus.REJECTED,
+  ];
   
-  return mockStudents.slice(0, 20).map((student, i) => {
+  const rejectionReasons = [
+    'GPA below minimum requirement of 3.0',
+    'Incomplete application documents',
+    'Failed to meet technical prerequisites',
+    'Insufficient recommendation letters',
+  ];
+  
+  return mockStudents.map((student, i) => {
     const universityCode = student.email.split('@')[1].split('.')[0].toUpperCase();
     const university = universities.find(u => u.code === universityCode);
-    const status = statuses[i % 3];
-    const submittedDate = new Date(2026, 3, 1 + i);
+    const status = statuses[i % statuses.length];
+    const submittedDate = new Date(2026, 2, 1 + Math.floor(i / 2)); // Spread over March
     const department = departments[i % departments.length];
     
     return {
@@ -63,29 +79,29 @@ function generateMockApplications(): InternshipApplication[] {
       student_name: student.full_name,
       student_institutional_id: `STU-2026-${String(i + 1).padStart(3, '0')}`,
       department,
-      gpa: 3.0 + Math.random() * 0.9,
+      gpa: status === ApplicationStatus.REJECTED ? 2.5 + Math.random() * 0.4 : 3.0 + Math.random() * 0.9,
       institutional_email: student.email,
       status,
-      reviewed_at: status !== ApplicationStatus.PENDING ? new Date(submittedDate.getTime() + 86400000 * 2).toISOString() : undefined,
-      reviewed_by: status !== ApplicationStatus.PENDING ? 'admin_1' : undefined,
-      rejection_reason: status === ApplicationStatus.REJECTED ? 'GPA below minimum requirement' : undefined,
+      reviewed_at: status !== ApplicationStatus.PENDING ? new Date(submittedDate.getTime() + 86400000 * (2 + Math.floor(Math.random() * 3))).toISOString() : undefined,
+      reviewed_by: status !== ApplicationStatus.PENDING ? (i % 2 === 0 ? 'admin_1' : 'admin_2') : undefined,
+      rejection_reason: status === ApplicationStatus.REJECTED ? rejectionReasons[i % rejectionReasons.length] : undefined,
       created_at: submittedDate.toISOString(),
-      updated_at: submittedDate.toISOString(),
+      updated_at: new Date(submittedDate.getTime() + 86400000 * 3).toISOString(),
     };
   });
 }
 
-// Generate mock assignments
+// Generate mock assignments - All approved applications get assignments
 function generateMockAssignments(): InternshipAssignment[] {
   const approvedApplications = getFromStorage<InternshipApplication[]>(
     STORAGE_KEYS.APPLICATIONS,
     generateMockApplications()
   ).filter(app => app.status === ApplicationStatus.APPROVED);
   
-  return approvedApplications.slice(0, 10).map((app, i) => {
+  return approvedApplications.map((app, i) => {
     const supervisor = mockSupervisors[i % mockSupervisors.length];
-    const startDate = new Date(2026, 4, 1);
-    const endDate = new Date(2026, 7, 31);
+    const startDate = new Date(2026, 4, 1); // May 1, 2026
+    const endDate = new Date(2026, 7, 31); // August 31, 2026
     
     return {
       assignment_id: `assign_${i + 1}`,
@@ -96,13 +112,12 @@ function generateMockAssignments(): InternshipAssignment[] {
       start_date: startDate.toISOString(),
       end_date: endDate.toISOString(),
       status: AssignmentStatus.ACTIVE,
-      created_at: new Date(2026, 3, 25 + i).toISOString(),
+      created_at: new Date(2026, 3, 25 + Math.floor(i / 2)).toISOString(),
     };
   });
 }
 
-// Generate mock milestones
-// Generate mock milestones
+// Generate mock milestones - All assignments get full milestone sets
 function generateMockMilestones(): Milestone[] {
   const assignments = getFromStorage<InternshipAssignment[]>(
     STORAGE_KEYS.ASSIGNMENTS,
@@ -111,34 +126,87 @@ function generateMockMilestones(): Milestone[] {
   
   const milestones: Milestone[] = [];
   const milestoneTemplates = [
-    { phase: 1, title: 'System Analysis Report', description: 'Complete system requirements analysis' },
-    { phase: 2, title: 'Database Design', description: 'Design and document database schema' },
-    { phase: 3, title: 'Backend API Development', description: 'Implement REST API endpoints' },
-    { phase: 4, title: 'Frontend Integration', description: 'Build user interface components' },
-    { phase: 5, title: 'Testing & QA', description: 'Comprehensive testing and bug fixes' },
-    { phase: 6, title: 'Final Presentation', description: 'Present completed project' },
+    { phase: 1, title: 'Orientation & Setup', description: 'Complete orientation and development environment setup' },
+    { phase: 2, title: 'System Analysis Report', description: 'Complete system requirements analysis and documentation' },
+    { phase: 3, title: 'Database Design', description: 'Design and document database schema with ER diagrams' },
+    { phase: 4, title: 'Backend API Development', description: 'Implement REST API endpoints and business logic' },
+    { phase: 5, title: 'Frontend Integration', description: 'Build user interface components and integrate with API' },
+    { phase: 6, title: 'Testing & QA', description: 'Comprehensive testing, bug fixes, and quality assurance' },
+    { phase: 7, title: 'Documentation', description: 'Complete technical and user documentation' },
+    { phase: 8, title: 'Final Presentation', description: 'Present completed project to stakeholders' },
   ];
   
   assignments.forEach((assignment, assignIdx) => {
     milestoneTemplates.forEach((template, milestoneIdx) => {
-      const dueDate = new Date(2026, 4, 15 + (milestoneIdx * 14));
-      const isSubmitted = milestoneIdx < 3; // First 3 milestones submitted
-      const status = milestoneIdx === 0 ? MilestoneStatus.ACCEPTED :
-                    milestoneIdx === 1 ? MilestoneStatus.ACCEPTED :
-                    milestoneIdx === 2 ? MilestoneStatus.PENDING_REVIEW :
-                    MilestoneStatus.PENDING_REVIEW;
+      const dueDate = new Date(2026, 4, 8 + (milestoneIdx * 10)); // Every 10 days
+      
+      // Vary milestone status based on assignment progress
+      let status: MilestoneStatus;
+      let isSubmitted: boolean;
+      let feedback: string | undefined;
+      
+      if (assignIdx < 3) {
+        // First 3 assignments: Advanced progress
+        if (milestoneIdx < 5) {
+          status = MilestoneStatus.ACCEPTED;
+          isSubmitted = true;
+          feedback = 'Excellent work! All requirements met with high quality.';
+        } else if (milestoneIdx === 5) {
+          status = MilestoneStatus.PENDING_REVIEW;
+          isSubmitted = true;
+        } else {
+          // Don't create milestones that haven't been submitted yet
+          return;
+        }
+      } else if (assignIdx < 8) {
+        // Next 5 assignments: Medium progress
+        if (milestoneIdx < 3) {
+          status = MilestoneStatus.ACCEPTED;
+          isSubmitted = true;
+          feedback = 'Good work! Meets all requirements.';
+        } else if (milestoneIdx === 3) {
+          status = MilestoneStatus.PENDING_REVIEW;
+          isSubmitted = true;
+        } else if (milestoneIdx === 4) {
+          status = MilestoneStatus.PENDING_REVISION;
+          isSubmitted = true;
+          feedback = 'Please address the following: Add more detailed error handling and improve code documentation.';
+        } else {
+          // Don't create milestones that haven't been submitted yet
+          return;
+        }
+      } else {
+        // Remaining assignments: Early progress
+        if (milestoneIdx < 2) {
+          status = MilestoneStatus.ACCEPTED;
+          isSubmitted = true;
+          feedback = 'Good start! Keep up the momentum.';
+        } else if (milestoneIdx === 2) {
+          status = MilestoneStatus.PENDING_REVIEW;
+          isSubmitted = true;
+        } else {
+          // Don't create milestones that haven't been submitted yet
+          return;
+        }
+      }
       
       milestones.push({
-        milestone_id: `milestone_${assignIdx}_${milestoneIdx + 1}`,
+        milestone_id: `milestone_${assignIdx + 1}_${milestoneIdx + 1}`,
         assignment_id: assignment.assignment_id,
         student_id: assignment.student_id,
         title: template.title,
-        description: isSubmitted ? `Completed ${template.title}. All requirements met.` : template.description,
-        submission_date: isSubmitted ? new Date(dueDate.getTime() - 86400000).toISOString() : dueDate.toISOString(),
+        description: isSubmitted 
+          ? `Completed ${template.title}. ${template.description}` 
+          : template.description,
+        submission_date: isSubmitted 
+          ? new Date(dueDate.getTime() - 86400000 * Math.floor(Math.random() * 3)).toISOString() 
+          : dueDate.toISOString(),
         status,
-        feedback: status === MilestoneStatus.ACCEPTED ? 'Good work! Meets all requirements.' : undefined,
+        feedback,
         locked: status === MilestoneStatus.ACCEPTED,
-        reviewed_at: status === MilestoneStatus.ACCEPTED ? new Date(dueDate.getTime() + 86400000).toISOString() : undefined,
+        reviewed_at: [MilestoneStatus.ACCEPTED, MilestoneStatus.PENDING_REVISION].includes(status) 
+          ? new Date(dueDate.getTime() + 86400000 * 2).toISOString() 
+          : undefined,
       });
     });
   });
@@ -146,61 +214,82 @@ function generateMockMilestones(): Milestone[] {
   return milestones;
 }
 
-// Generate mock evaluations
+// Generate mock evaluations - More evaluations with varied data
 function generateMockEvaluations(): Evaluation[] {
   const assignments = getFromStorage<InternshipAssignment[]>(
     STORAGE_KEYS.ASSIGNMENTS,
     generateMockAssignments()
   );
   
-  return assignments.slice(0, 5).map((assignment, i) => {
-    const grades: LetterGrade[] = [LetterGrade.A, LetterGrade.B, LetterGrade.C];
+  const grades: LetterGrade[] = [LetterGrade.A, LetterGrade.A, LetterGrade.B, LetterGrade.B, LetterGrade.C];
+  const remarks = [
+    'Excellent performance throughout the internship period. Shows great potential and initiative.',
+    'Very good work ethic and technical skills. Consistently met deadlines and quality standards.',
+    'Good performance with room for improvement in communication and teamwork.',
+    'Satisfactory performance. Completed assigned tasks but could show more initiative.',
+    'Adequate performance. Needs improvement in technical skills and time management.',
+  ];
+  
+  return assignments.slice(0, 12).map((assignment, i) => {
     const grade = grades[i % grades.length];
+    const isDraft = i >= 8; // Last 4 are drafts
     
     return {
       evaluation_id: `eval_${i + 1}`,
       assignment_id: assignment.assignment_id,
       student_id: assignment.student_id,
       supervisor_id: assignment.supervisor_id,
-      attendance_rating: 4 + Math.floor(Math.random() * 2),
-      technical_rating: 3 + Math.floor(Math.random() * 3),
-      teamwork_rating: 4 + Math.floor(Math.random() * 2),
-      communication_rating: 3 + Math.floor(Math.random() * 3),
-      initiative_rating: 3 + Math.floor(Math.random() * 3),
+      attendance_rating: 3 + Math.floor(Math.random() * 3), // 3-5
+      technical_rating: 3 + Math.floor(Math.random() * 3), // 3-5
+      teamwork_rating: 3 + Math.floor(Math.random() * 3), // 3-5
+      communication_rating: 3 + Math.floor(Math.random() * 3), // 3-5
+      initiative_rating: 3 + Math.floor(Math.random() * 3), // 3-5
       final_grade: grade,
-      remarks: 'Excellent performance throughout the internship period. Shows great potential.',
-      status: i < 2 ? EvaluationStatus.PUBLISHED : EvaluationStatus.DRAFT,
-      submitted_at: new Date(2026, 7, 20 + i).toISOString(),
-      published_at: i < 2 ? new Date(2026, 7, 25 + i).toISOString() : undefined,
+      remarks: remarks[i % remarks.length],
+      status: isDraft ? EvaluationStatus.DRAFT : EvaluationStatus.PUBLISHED,
+      submitted_at: new Date(2026, 7, 15 + i).toISOString(),
+      published_at: isDraft ? undefined : new Date(2026, 7, 20 + i).toISOString(),
     };
   });
 }
 
-// Generate mock attendance records
+// Generate mock attendance records - All assignments get attendance
 function generateMockAttendance(): Attendance[] {
   const assignments = getFromStorage<InternshipAssignment[]>(
     STORAGE_KEYS.ASSIGNMENTS,
     generateMockAssignments()
   );
   
-  return assignments.slice(0, 8).map((assignment, i) => {
+  return assignments.map((assignment, i) => {
     const student = mockStudents.find(s => s.user_id === assignment.student_id);
     const supervisor = mockSupervisors.find(s => s.user_id === assignment.supervisor_id);
+    
+    // Vary attendance percentages realistically
+    let percentage: number;
+    if (i < 5) {
+      percentage = 90 + Math.floor(Math.random() * 11); // 90-100% (Excellent)
+    } else if (i < 12) {
+      percentage = 75 + Math.floor(Math.random() * 15); // 75-89% (Good)
+    } else if (i < 16) {
+      percentage = 60 + Math.floor(Math.random() * 15); // 60-74% (Fair)
+    } else {
+      percentage = 50 + Math.floor(Math.random() * 10); // 50-59% (Poor)
+    }
     
     return {
       attendance_id: i + 1,
       internship_id: i + 1,
       student_id: assignment.student_id,
-      percentage: 75 + Math.floor(Math.random() * 25), // 75-100%
+      percentage,
       marked_by: assignment.supervisor_id,
-      updated_at: new Date(2026, 7, 15 + i).toISOString(),
+      updated_at: new Date(2026, 7, 10 + Math.floor(i / 3)).toISOString(),
       student_name: student?.full_name || assignment.student_name,
       supervisor_name: supervisor?.full_name || assignment.supervisor_name,
     };
   });
 }
 
-// Generate mock monthly reports
+// Generate mock monthly reports - All assignments get monthly reports
 function generateMockMonthlyReports(): MonthlyReport[] {
   const assignments = getFromStorage<InternshipAssignment[]>(
     STORAGE_KEYS.ASSIGNMENTS,
@@ -208,19 +297,59 @@ function generateMockMonthlyReports(): MonthlyReport[] {
   );
   
   const reports: MonthlyReport[] = [];
-  const months = [5, 6, 7]; // May, June, July
+  const months = [5, 6, 7]; // May, June, July 2026
   
-  assignments.slice(0, 5).forEach((assignment, assignIdx) => {
+  const summaryTemplates = [
+    'Completed orientation and initial project setup. Familiarized with codebase and development tools. Met with team members and established communication channels.',
+    'Made significant progress on assigned tasks. Completed database schema design and began API development. Attended weekly team meetings and code reviews.',
+    'Successfully implemented core features and resolved several technical challenges. Improved code quality based on supervisor feedback. Prepared for mid-term presentation.',
+  ];
+  
+  const feedbackTemplates = [
+    'Good start! Keep up the momentum and don\'t hesitate to ask questions.',
+    'Excellent progress. Your technical skills are developing well. Continue focusing on code quality.',
+    'Outstanding work this month. You\'re exceeding expectations. Keep it up!',
+    'Good effort, but please improve documentation and code comments.',
+    'Satisfactory progress. Need to see more initiative and proactive communication.',
+  ];
+  
+  assignments.forEach((assignment, assignIdx) => {
     const student = mockStudents.find(s => s.user_id === assignment.student_id);
     const supervisor = mockSupervisors.find(s => s.user_id === assignment.supervisor_id);
     
     months.forEach((month, monthIdx) => {
-      const statuses: MonthlyReportStatus[] = [
-        MonthlyReportStatus.APPROVED,
-        MonthlyReportStatus.REVIEWED,
-        MonthlyReportStatus.SUBMITTED
-      ];
-      const status = statuses[monthIdx];
+      // Vary status based on assignment and month
+      let status: MonthlyReportStatus;
+      if (assignIdx < 8) {
+        // First 8 assignments: All months submitted and reviewed
+        if (monthIdx === 0) {
+          status = MonthlyReportStatus.APPROVED;
+        } else if (monthIdx === 1) {
+          status = MonthlyReportStatus.APPROVED;
+        } else {
+          status = assignIdx < 4 ? MonthlyReportStatus.APPROVED : MonthlyReportStatus.REVIEWED;
+        }
+      } else if (assignIdx < 14) {
+        // Next 6 assignments: Some pending
+        if (monthIdx === 0) {
+          status = MonthlyReportStatus.APPROVED;
+        } else if (monthIdx === 1) {
+          status = MonthlyReportStatus.REVIEWED;
+        } else {
+          status = MonthlyReportStatus.SUBMITTED;
+        }
+      } else {
+        // Remaining: Early stage
+        if (monthIdx === 0) {
+          status = MonthlyReportStatus.APPROVED;
+        } else if (monthIdx === 1) {
+          status = assignIdx % 2 === 0 ? MonthlyReportStatus.SUBMITTED : MonthlyReportStatus.RETURNED;
+        } else {
+          status = MonthlyReportStatus.SUBMITTED;
+        }
+      }
+      
+      const hasReview = status !== MonthlyReportStatus.SUBMITTED;
       
       reports.push({
         report_id: assignIdx * 3 + monthIdx + 1,
@@ -228,12 +357,12 @@ function generateMockMonthlyReports(): MonthlyReport[] {
         student_id: assignment.student_id,
         month,
         year: 2026,
-        summary: `Monthly progress report for ${new Date(2026, month - 1).toLocaleString('default', { month: 'long' })}. Completed assigned tasks and milestones on schedule.`,
-        submitted_at: new Date(2026, month - 1, 28).toISOString(),
-        reviewed_by: status !== MonthlyReportStatus.SUBMITTED ? assignment.supervisor_id : undefined,
-        reviewer_name: status !== MonthlyReportStatus.SUBMITTED ? supervisor?.full_name : undefined,
+        summary: summaryTemplates[monthIdx] + ` Worked on ${departments[assignIdx % departments.length]} related tasks and gained valuable hands-on experience.`,
+        submitted_at: new Date(2026, month - 1, 25 + Math.floor(Math.random() * 4)).toISOString(),
+        reviewed_by: hasReview ? assignment.supervisor_id : undefined,
+        reviewer_name: hasReview ? supervisor?.full_name : undefined,
         status,
-        feedback: status === MonthlyReportStatus.APPROVED ? 'Good progress. Keep up the good work.' : undefined,
+        feedback: hasReview ? feedbackTemplates[assignIdx % feedbackTemplates.length] : undefined,
         student_name: student?.full_name || assignment.student_name,
       });
     });

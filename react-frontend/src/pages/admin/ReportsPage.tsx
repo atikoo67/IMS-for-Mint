@@ -67,7 +67,9 @@ export default function AdminReportsPage() {
                   Detailed breakdown of all applications by status and university
                 </p>
               </div>
-              <Button variant="primary">Download PDF</Button>
+              <Button variant="primary" onClick={() => alert('Generating Application Status Report PDF...')}>
+                Download PDF
+              </Button>
             </div>
 
             <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
@@ -78,8 +80,12 @@ export default function AdminReportsPage() {
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button variant="primary">Download PDF</Button>
-                <Button variant="secondary">Download CSV</Button>
+                <Button variant="primary" onClick={() => alert('Generating Cohort Grade Report PDF...')}>
+                  Download PDF
+                </Button>
+                <Button variant="secondary" onClick={() => alert('Generating Cohort Grade Report CSV...')}>
+                  Download CSV
+                </Button>
               </div>
             </div>
 
@@ -90,7 +96,9 @@ export default function AdminReportsPage() {
                   Overview of supervisor workload and student assignments
                 </p>
               </div>
-              <Button variant="primary">Download PDF</Button>
+              <Button variant="primary" onClick={() => alert('Generating Supervisor Assignment Report PDF...')}>
+                Download PDF
+              </Button>
             </div>
 
             <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
@@ -100,7 +108,9 @@ export default function AdminReportsPage() {
                   User activity and system usage statistics
                 </p>
               </div>
-              <Button variant="primary">Download PDF</Button>
+              <Button variant="primary" onClick={() => alert('Generating System Activity Report PDF...')}>
+                Download PDF
+              </Button>
             </div>
           </div>
         </Card>

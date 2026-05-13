@@ -12,3 +12,5 @@ export { EmptyState } from './EmptyState';
 export { ConfirmDialog } from './ConfirmDialog';
 export { EthiopianFlag } from './EthiopianFlag';
 export { StatCard } from './StatCard';
+export { Toast, ToastContainer } from './Toast';
+export type { ToastType } from './Toast';

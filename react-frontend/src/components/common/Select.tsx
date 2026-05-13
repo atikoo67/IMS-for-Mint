@@ -10,7 +10,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
   helperText?: string;
-  options: SelectOption[];
+  options?: SelectOption[];
   placeholder?: string;
 }
 
@@ -22,6 +22,7 @@ export const Select: React.FC<SelectProps> = ({
   placeholder,
   className = '',
   id,
+  children,
   ...props
 }) => {
   const selectId = id || label?.toLowerCase().replace(/\s+/g, '-');
@@ -50,11 +51,15 @@ export const Select: React.FC<SelectProps> = ({
             {placeholder}
           </option>
         )}
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
+        {options ? (
+          options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))
+        ) : (
+          children
+        )}
       </select>
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
       {helperText && !error && <p className="mt-1 text-sm text-gray-500">{helperText}</p>}

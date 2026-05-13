@@ -40,6 +40,20 @@ export default function AdminEvaluationsPage() {
     }
   };
 
+  const handleReturnForCorrection = async () => {
+    if (!window.confirm('Return this evaluation to the supervisor for corrections?')) {
+      return;
+    }
+
+    try {
+      // In real app, would call API to return evaluation
+      alert('Evaluation returned to supervisor for corrections');
+      loadEvaluations();
+    } catch (error) {
+      alert('Failed to return evaluation');
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -110,7 +124,12 @@ export default function AdminEvaluationsPage() {
                     >
                       Publish Evaluation
                     </Button>
-                    <Button variant="secondary">Return for Correction</Button>
+                    <Button 
+                      variant="secondary"
+                      onClick={handleReturnForCorrection}
+                    >
+                      Return for Correction
+                    </Button>
                   </div>
                 </div>
               </Card>

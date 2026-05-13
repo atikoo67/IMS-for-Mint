@@ -48,6 +48,7 @@ export default function AdminApplicationsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           }
+          onClick={() => alert('New Application feature: This would open a form to manually create an application for a student.')}
         >
           New Application
         </Button>
